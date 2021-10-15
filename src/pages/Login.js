@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, Link } from 'react-router-dom'
-import { googleSignInInitiate } from '../redux/action'
+import { Link, useHistory } from 'react-router-dom'
+import { googleSignInInitiate, loginInitiate } from '../redux/action'
 import './Login.css'
 
 const Login = () => {
@@ -10,13 +10,31 @@ const Login = () => {
         password: '',
     });
 
+    const { currentUser } = useSelector((state) => state.user)
+
+    const history = useHistory();
+    useEffect(() => {
+        if (currentUser) {
+            history.push('/')
+        }
+    }, [currentUser, history])
+
     const dispatch = useDispatch();
 
     const { email, password } = state;
-    const handleSubmit = () => { }
     const handleGoogleSignIn = () => {
         dispatch(googleSignInInitiate())
     }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!email || !password) {
+            return;
+        }
+        dispatch(loginInitiate(email, password))
+        setstate({ email: "", password: "" })
+    }
+
     const handleChange = (e) => {
         let { name, value } = e.target;
         setstate({ ...state, [name]: value })
@@ -65,6 +83,11 @@ const Login = () => {
                     <Link to='/register'>
                         <button className='btn btn-primary btn-block' type='button' id="btn-">
                             <i className="fas fa-user-plus"></i>  Sign up New Account
+                        </button>
+                    </Link>
+                    <Link to='/'>
+                        <button className='btn btn-primary btn-block' type='button' id="btn-">
+                            Go to Home Page
                         </button>
                     </Link>
                 </form>
